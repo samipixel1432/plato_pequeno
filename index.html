@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Plato Pequeño – Feeding bodies, planting hope</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Dancing+Script:wght@600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .font-display { font-family: 'Cormorant Garamond', serif; }
+    .font-script { font-family: 'Dancing Script', cursive; }
+    .font-body { font-family: 'Jost', sans-serif; }
+  </style>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            teal: { DEFAULT: '#5aaba0', dark: '#3d8a82', light: '#d4ecea' },
+            blush: { DEFAULT: '#f2b8b0', light: '#fce8e4' },
+            brown: { DEFAULT: '#b07040', dark: '#8b5a30' },
+            charcoal: '#3a3535',
+            cream: '#fdfaf8'
+          },
+          animation: {
+            'fade-in': 'fadeIn 0.8s ease-out forwards',
+            'slide-up': 'slideUp 0.8s ease-out forwards',
+            'slide-down': 'slideDown 0.6s ease-out forwards',
+          },
+          keyframes: {
+            fadeIn: {
+              '0%': { opacity: '0' },
+              '100%': { opacity: '1' },
+            },
+            slideUp: {
+              '0%': { opacity: '0', transform: 'translateY(40px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            },
+            slideDown: {
+              '0%': { opacity: '0', transform: 'translateY(-20px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            },
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .scroll-reveal { opacity: 0; transform: translateY(60px); transition: opacity 1.2s cubic-bezier(0.16,1,0.3,1), transform 1.2s cubic-bezier(0.16,1,0.3,1); }
+    .scroll-reveal.visible { opacity: 1; transform: translateY(0); }
+    .btn-hover { transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.2s ease; }
+    .btn-hover:hover { transform: translateY(-3px) scale(1.06); box-shadow: 0 8px 20px rgba(90,171,160,0.3); }
+    #asistente-chat {
+      transition: opacity 0.3s ease, transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+      transform-origin: bottom right;
+      opacity: 0;
+      transform: scale(0.82) translateY(18px);
+      pointer-events: none;
+    }
+    #asistente-chat.chat-open {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+      pointer-events: auto;
+    }
+    .typing-dot { display:inline-block; width:6px; height:6px; border-radius:50%; background:#5aaba0; margin:0 2px; animation:typingBounce 1.2s infinite; }
+    .typing-dot:nth-child(2) { animation-delay:0.2s; }
+    .typing-dot:nth-child(3) { animation-delay:0.4s; }
+    @keyframes typingBounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-6px)} }
+  </style>
+</head>
+<body class="font-body bg-blush-light text-charcoal overflow-x-hidden">
+
+  <!-- Nav -->
+  <nav class="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 bg-blush-light/95 backdrop-blur-md border-b border-blush">
+    <div class="max-w-7xl mx-auto w-full flex items-center justify-between">
+      <div class="font-display text-xl font-semibold text-brown tracking-widest uppercase">Plato Pequeño</div>
+      <ul class="hidden md:flex gap-6 list-none items-center">
+        <li><a href="#inicio" class="text-sm font-medium uppercase tracking-wide text-charcoal hover:text-teal-dark transition" data-es="Inicio" data-en="Home">Inicio</a></li>
+        <li><a href="#nosotros" class="text-sm font-medium uppercase tracking-wide text-charcoal hover:text-teal-dark transition" data-es="Nosotros" data-en="About Us">Nosotros</a></li>
+        <li><a href="#servicios" class="text-sm font-medium uppercase tracking-wide text-charcoal hover:text-teal-dark transition" data-es="Servicios" data-en="Services">Servicios</a></li>
+        <li><a href="#impacto" class="text-sm font-medium uppercase tracking-wide text-charcoal hover:text-teal-dark transition" data-es="Impacto" data-en="Impact">Impacto</a></li>
+        <li><a href="perfil.html" id="nav-perfil" class="text-sm font-medium uppercase tracking-wide text-charcoal hover:text-teal-dark transition hidden" data-es="Mi Perfil" data-en="My Profile">Mi Perfil</a></li>
+        <li><a href="#" id="nav-login" onclick="abrirLogin(event)" class="text-sm font-medium uppercase tracking-wide text-charcoal hover:text-teal-dark transition" data-es="Iniciar Sesión" data-en="Log In">Iniciar Sesión</a></li>
+        <li><a href="#donar" onclick="abrirDonar(event)" class="bg-teal text-white px-5 py-2 rounded-full text-xs font-medium uppercase tracking-wide hover:bg-teal-dark transition transform hover:-translate-y-0.5" data-es="Donar" data-en="Donate">Donar</a></li>
+        <li><button onclick="cambiarIdioma()" class="ml-2 px-3 py-1.5 border border-teal rounded-full cursor-pointer text-teal-dark text-xs hover:bg-teal hover:text-white transition">🌐 <span id="idioma-actual">ES</span></button></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section id="inicio" class="min-h-screen flex items-center pt-24 pb-16 relative overflow-hidden bg-blush-light">
+    <div class="max-w-7xl mx-auto px-6 w-full grid md:grid-cols-2 gap-12 items-center">
+      <!-- Decoración fondo -->
+      <div class="absolute -top-20 -left-10 w-64 h-64 rounded-full bg-blush-light opacity-60"></div>
+      <div class="absolute -bottom-16 -right-10 w-52 h-52 rounded-full bg-blush-light opacity-60"></div>
+
+      <div class="relative z-10 fade-in">
+        <span class="font-script text-lg text-blush block mb-3" data-es="Bienvenidos a" data-en="Welcome to">Bienvenidos a</span>
+        <h1 class="font-display text-4xl md:text-6xl font-semibold text-brown uppercase tracking-wide leading-tight mb-5 slide-up">Plato<br/>Pequeño</h1>
+        <p class="font-script text-xl md:text-2xl text-brown-dark mb-8 leading-relaxed slide-up" data-es="Alimentamos cuerpos, sembramos esperanza" data-en="Feeding bodies, planting hope">Alimentamos cuerpos, sembramos esperanza</p>
+        <p class="text-base font-light leading-relaxed text-charcoal mb-10 fade-in" data-es="Un proyecto social comprometido con la nutrición y el bienestar de las comunidades más vulnerables. Cada plato es un acto de amor, cada sonrisa es nuestra recompensa." data-en="A social project committed to the nutrition and well-being of the most vulnerable communities. Every dish is an act of love, every smile is our reward.">
+          Un proyecto social comprometido con la nutrición y el bienestar de las comunidades más vulnerables.
+          Cada plato es un acto de amor, cada sonrisa es nuestra recompensa.
+        </p>
+        <div class="flex gap-4 flex-wrap fade-in">
+          <a href="#servicios" class="inline-flex items-center gap-2 bg-teal text-white px-7 py-3.5 rounded-full text-sm font-medium uppercase tracking-wide hover:bg-teal-dark transition transform hover:-translate-y-0.5 shadow-lg shadow-teal/30" data-es="Ver servicios ↓" data-en="See services ↓">Ver servicios ↓</a>
+          <a href="#impacto" class="inline-flex items-center gap-2 border-2 border-brown text-brown px-7 py-3.5 rounded-full text-sm font-medium uppercase tracking-wide hover:bg-brown hover:text-white transition" data-es="Nuestro impacto" data-en="Our impact">Nuestro impacto</a>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-center relative z-10 scale-in">
+        <img src="Captura de pantalla 2026-04-09 165831.png" alt="Plato Pequeño Logo" class="w-64 md:w-80 lg:w-96 rounded-full shadow-2xl shadow-teal/30" />
+      </div>
+    </div>
+  </section>
+
+  <!-- Nosotros -->
+  <section id="nosotros" class="py-20 bg-blush scroll-reveal">
+    <div class="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
+    <div class="fade-in">
+      <span class="inline-block bg-teal-light text-teal-dark text-xs font-medium uppercase tracking-widest px-4 py-1.5 rounded-full mb-5" data-es="Quiénes somos" data-en="Who we are">Quiénes somos</span>
+      <h2 class="font-display text-4xl md:text-5xl font-semibold text-brown leading-tight mb-5 slide-up" data-es="Una mesa abierta<br/>para todos" data-en="An open table<br/>for everyone">Una mesa abierta<br/>para todos</h2>
+      <p class="text-base font-light leading-relaxed text-charcoal mb-7" data-es="Plato Pequeño nació del compromiso de garantizar alimentación digna a quienes más lo necesitan. Trabajamos con comunidades, familias y voluntarios para construir una red de solidaridad que trasciende el plato." data-en="Plato Pequeño was born from the commitment to guarantee dignified food for those who need it most. We work with communities, families and volunteers to build a network of solidarity that transcends the plate.">
+        Plato Pequeño nació del compromiso de garantizar alimentación digna a quienes más lo necesitan.
+        Trabajamos con comunidades, familias y voluntarios para construir una red de solidaridad que trasciende el plato.
+      </p>
+      <p class="text-base font-light leading-relaxed text-charcoal mb-7" data-es="Creemos que la alimentación es un derecho, no un privilegio. Por eso cada acción que tomamos está orientada hacia un futuro más justo y nutritivo para toda la comunidad." data-en="We believe that food is a right, not a privilege. That is why every action we take is oriented towards a fairer and more nutritious future for the entire community.">
+        Creemos que la alimentación es un derecho, no un privilegio. Por eso cada acción que tomamos
+        está orientada hacia un futuro más justo y nutritivo para toda la comunidad.
+      </p>
+      <a href="#servicios" class="inline-flex items-center gap-2 bg-teal text-white px-8 py-4 rounded-full text-sm font-medium uppercase tracking-wide hover:bg-teal-dark transition transform hover:-translate-y-0.5 shadow-lg shadow-teal/30" data-es="Conoce nuestros servicios" data-en="See our services">Conoce nuestros servicios</a>
+    </div>
+
+    <div class="bg-white rounded-3xl p-10 shadow-xl shadow-brown/8 scale-in">
+      <div class="flex items-start gap-4 mb-7 stagger">
+        <div class="w-12 h-12 rounded-xl bg-teal-light flex items-center justify-center text-2xl flex-shrink-0 stagger-item">🌱</div>
+        <div class="stagger-item">
+          <div class="font-display text-2xl font-semibold text-teal-dark mb-1" data-es="Misión" data-en="Mission">Misión</div>
+          <div class="text-sm text-charcoal" data-es="Alimentar con dignidad y amor a las comunidades vulnerables." data-en="Feeding vulnerable communities with dignity and love.">Alimentar con dignidad y amor a las comunidades vulnerables.</div>
+        </div>
+      </div>
+      <div class="flex items-start gap-4 mb-7 stagger">
+        <div class="w-12 h-12 rounded-xl bg-teal-light flex items-center justify-center text-2xl flex-shrink-0 stagger-item">🌟</div>
+        <div class="stagger-item">
+          <div class="font-display text-2xl font-semibold text-teal-dark mb-1" data-es="Visión" data-en="Vision">Visión</div>
+          <div class="text-sm text-charcoal" data-es="Ser un referente de impacto social a través de la alimentación." data-en="To be a benchmark of social impact through food.">Ser un referente de impacto social a través de la alimentación.</div>
+        </div>
+      </div>
+      <div class="flex items-start gap-4 stagger">
+        <div class="w-12 h-12 rounded-xl bg-teal-light flex items-center justify-center text-2xl flex-shrink-0 stagger-item">💚</div>
+        <div class="stagger-item">
+          <div class="font-display text-2xl font-semibold text-teal-dark mb-1" data-es="Valores" data-en="Values">Valores</div>
+          <div class="text-sm text-charcoal" data-es="Solidaridad, transparencia, compromiso y calidez humana." data-en="Solidarity, transparency, commitment and human warmth.">Solidaridad, transparencia, compromiso y calidez humana.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Servicios -->
+  <section id="servicios" class="py-24 px-6vw bg-blush-light text-center scroll-reveal">
+    <div class="mb-14">
+      <span class="inline-block bg-teal-light text-teal-dark text-xs font-medium uppercase tracking-widest px-4 py-1.5 rounded-full mb-5" data-es="Lo que hacemos" data-en="What we do">Lo que hacemos</span>
+      <h2 class="font-display text-4xl md:text-5xl font-semibold text-brown mb-4" data-es="Nuestros servicios" data-en="Our services">Nuestros servicios</h2>
+      <p class="text-base font-light leading-relaxed text-charcoal max-w-2xl mx-auto" data-es="Ofrecemos diferentes programas diseñados para generar un impacto real y sostenible en las comunidades que atendemos." data-en="We offer different programs designed to generate real and sustainable impact in the communities we serve.">
+        Ofrecemos diferentes programas diseñados para generar un impacto real y sostenible en las comunidades que atendemos.
+      </p>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-7 max-w-3xl mx-auto stagger">
+      <!-- Card 1 -->
+      <div class="bg-white rounded-3xl p-10 text-left border border-transparent hover:border-teal transition transform hover:-translate-y-2 hover:shadow-xl hover:shadow-teal/15 cursor-pointer group stagger-item">
+        <div class="w-14 h-14 rounded-xl bg-blush-light flex items-center justify-center text-3xl mb-6 group-hover:bg-teal-light transition">🍲</div>
+        <h3 class="font-display text-2xl font-semibold text-brown mb-3" data-es="Comedores Comunitarios" data-en="Community Dining Halls">Comedores Comunitarios</h3>
+        <p class="text-sm font-light leading-relaxed text-charcoal" data-es="Contamos con comedores comunitarios que ofrecen alimentación colectiva con menús nutritivos y preparados con amor para familias de escasos recursos." data-en="We have community dining halls that offer collective meals with nutritious menus prepared with love for low-income families.">Contamos con comedores comunitarios que ofrecen alimentación colectiva con menús nutritivos y preparados con amor para familias de escasos recursos.</p>
+      </div>
+      <!-- Card 2 -->
+      <div class="bg-white rounded-3xl p-10 text-left border border-transparent hover:border-teal transition transform hover:-translate-y-2 hover:shadow-xl hover:shadow-teal/15 cursor-pointer group stagger-item">
+        <div class="w-14 h-14 rounded-xl bg-blush-light flex items-center justify-center text-3xl mb-6 group-hover:bg-teal-light transition">🚚</div>
+        <h3 class="font-display text-2xl font-semibold text-brown mb-3" data-es="Recolección de Comida" data-en="Food Collection">Recolección de Comida</h3>
+        <p class="text-sm font-light leading-relaxed text-charcoal" data-es="Realizamos recolección de alimentos para redistribuirlos a familias en situación de vulnerabilidad, reduciendo el desperdicio y ampliando nuestro alcance comunitario." data-en="We collect food to redistribute to vulnerable families, reducing waste and expanding our community reach.">Realizamos recolección de alimentos para redistribuirlos a familias en situación de vulnerabilidad, reduciendo el desperdicio y ampliando nuestro alcance comunitario.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Impacto -->
+  <section id="impacto" class="py-24 px-6vw bg-teal text-center relative overflow-hidden scroll-reveal">
+    <div class="absolute -top-28 -left-28 w-96 h-96 rounded-full bg-white/6"></div>
+    <div class="absolute -bottom-20 -right-16 w-72 h-72 rounded-full bg-white/6"></div>
+
+    <span class="inline-block bg-white/20 text-white text-xs font-medium uppercase tracking-widest px-4 py-1.5 rounded-full mb-5 relative z-10" data-es="Nuestro impacto" data-en="Our impact">Nuestro impacto</span>
+    <h2 class="font-display text-4xl md:text-5xl font-semibold text-white mb-4 leading-tight relative z-10" data-es="Juntos hacemos<br/>la diferencia" data-en="Together we make<br/>the difference">Juntos hacemos<br/>la diferencia</h2>
+    <p class="font-script text-2xl text-white/85 mb-12 relative z-10" data-es="Cada donación, cada voluntario, cada plato cuenta" data-en="Every donation, every volunteer, every dish counts">Cada donación, cada voluntario, cada plato cuenta</p>
+
+    <div class="flex justify-center gap-16 flex-wrap mb-12 relative z-10 stagger">
+      <div class="impact-stat stagger-item">
+        <div class="font-display text-5xl font-semibold text-white leading-none">500+</div>
+        <div class="text-xs text-white/75 uppercase tracking-wide mt-2" data-es="Familias atendidas" data-en="Families served">Familias atendidas</div>
+      </div>
+      <div class="impact-stat stagger-item">
+        <div class="font-display text-5xl font-semibold text-white leading-none">12k</div>
+        <div class="text-xs text-white/75 uppercase tracking-wide mt-2" data-es="Platos servidos" data-en="Dishes served">Platos servidos</div>
+      </div>
+      <div class="impact-stat stagger-item">
+        <div class="font-display text-5xl font-semibold text-white leading-none">80+</div>
+        <div class="text-xs text-white/75 uppercase tracking-wide mt-2" data-es="Voluntarios activos" data-en="Active volunteers">Voluntarios activos</div>
+      </div>
+    </div>
+
+    <a href="#donar" onclick="abrirDonar(event)" class="inline-flex items-center gap-2 bg-white text-teal-dark px-10 py-4 rounded-full text-sm font-medium uppercase tracking-wide hover:shadow-lg transition transform hover:-translate-y-0.5 relative z-10" data-es="Únete al movimiento →" data-en="Join the movement →">Únete al movimiento →</a>
+  </section>
+
+  <!-- Footer -->
+  <footer id="contacto" class="bg-charcoal text-white/70 py-14 px-6vw grid md:grid-cols-3 gap-12">
+    <div>
+      <div class="font-display text-2xl font-semibold text-white uppercase tracking-wide mb-4">Plato Pequeño</div>
+      <div class="font-script text-base text-blush mb-5" data-es="Alimentamos cuerpos, sembramos esperanza" data-en="Feeding bodies, planting hope">Alimentamos cuerpos, sembramos esperanza</div>
+      <p class="text-sm font-light leading-relaxed" data-es="Un proyecto de impacto social que cree en el poder de la alimentación para transformar vidas y comunidades enteras." data-en="A social impact project that believes in the power of food to transform lives and entire communities.">
+        Un proyecto de impacto social que cree en el poder de la alimentación para transformar vidas y comunidades enteras.
+      </p>
+    </div>
+    <div>
+      <h4 class="font-body text-xs font-medium uppercase tracking-widest text-teal mb-5" data-es="Navegación" data-en="Navigation">Navegación</h4>
+      <ul class="list-none">
+        <li class="mb-2.5"><a href="#inicio" class="text-sm text-white/65 hover:text-blush transition" data-es="Inicio" data-en="Home">Inicio</a></li>
+        <li class="mb-2.5"><a href="#nosotros" class="text-sm text-white/65 hover:text-blush transition" data-es="Nosotros" data-en="About Us">Nosotros</a></li>
+        <li class="mb-2.5"><a href="#servicios" class="text-sm text-white/65 hover:text-blush transition" data-es="Servicios" data-en="Services">Servicios</a></li>
+        <li class="mb-2.5"><a href="#impacto" class="text-sm text-white/65 hover:text-blush transition" data-es="Impacto" data-en="Impact">Impacto</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4 class="font-body text-xs font-medium uppercase tracking-widest text-teal mb-5" data-es="Contacto" data-en="Contact">Contacto</h4>
+      <ul class="list-none">
+        <li class="mb-2.5"><a href="mailto:platopequeno6@gmail.com" class="text-sm text-white/65 hover:text-blush transition">platopequeno6@gmail.com</a></li>
+        <li class="mb-2.5"><a href="#" class="text-sm text-white/65 hover:text-blush transition">Instagram</a></li>
+        <li class="mb-2.5"><a href="https://wa.me/573008546902" target="_blank" class="text-sm text-white/65 hover:text-blush transition">WhatsApp</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <div class="bg-charcoal border-t border-white/8 text-center py-4 px-6vw text-xs text-white/35">
+    © 2026 Plato Pequeño · <span data-es="Todos los derechos reservados" data-en="All rights reserved">Todos los derechos reservados</span>
+  </div>
+
+  <!-- Modal Login -->
+  <div id="modal-login" class="fixed inset-0 bg-charcoal/80 flex items-center justify-center z-[9999] hidden">
+    <div class="bg-cream p-10 rounded-3xl max-w-md w-11/12 relative shadow-2xl animate-[slideDown_0.4s_ease-out]">
+      <button class="modal-close absolute top-4 right-4 bg-none border-none text-3xl cursor-pointer text-charcoal" onclick="cerrarLogin()">&times;</button>
+      <h2 class="font-display text-3xl text-brown mb-2">Iniciar Sesión</h2>
+      <p class="font-script text-xl text-teal-dark mb-6">Accede para continuar</p>
+
+      <form class="flex flex-col gap-4" onsubmit="iniciarSesion(event)">
+        <input type="email" id="login-email" placeholder="Tu correo electrónico" required class="px-5 py-3.5 border border-blush rounded-full font-body text-base focus:outline-none focus:ring-2 focus:ring-teal" />
+        <div class="relative">
+          <input type="password" id="login-password" placeholder="Tu contraseña" required class="w-full px-5 py-3.5 border border-blush rounded-full font-body text-base focus:outline-none focus:ring-2 focus:ring-teal" />
+          <button type="button" onclick="verPassword()" class="absolute right-4 top-1/2 -translate-y-1/2 bg-none border-none cursor-pointer text-xl">👁️</button>
+        </div>
+        <button type="submit" class="bg-teal text-white px-8 py-3.5 rounded-full text-sm font-medium uppercase tracking-wide hover:bg-teal-dark transition shadow-lg shadow-teal/30 w-full btn-hover">Ingresar</button>
+      </form>
+      <p class="mt-5 text-sm text-charcoal text-center">
+        ¿No tienes cuenta? <a href="#" onclick="mostrarRegistro(); return false;" class="text-teal-dark">Regístrate aquí</a>
+      </p>
+
+      <form class="flex flex-col gap-4 mt-6 hidden" id="registro-form" onsubmit="registrarUsuario(event)">
+        <input type="text" id="registro-nombre" placeholder="Tu nombre completo" required class="px-5 py-3.5 border border-blush rounded-full font-body text-base focus:outline-none focus:ring-2 focus:ring-teal" />
+        <input type="email" id="registro-email" placeholder="Tu correo electrónico" required class="px-5 py-3.5 border border-blush rounded-full font-body text-base focus:outline-none focus:ring-2 focus:ring-teal" />
+        <div class="relative">
+          <input type="password" id="registro-password" placeholder="Crea una contraseña" required class="w-full px-5 py-3.5 border border-blush rounded-full font-body text-base focus:outline-none focus:ring-2 focus:ring-teal" />
+          <button type="button" onclick="verPasswordRegistro()" class="absolute right-4 top-1/2 -translate-y-1/2 bg-none border-none cursor-pointer text-xl">👁️</button>
+        </div>
+        <button type="submit" class="bg-teal text-white px-8 py-3.5 rounded-full text-sm font-medium uppercase tracking-wide hover:bg-teal-dark transition shadow-lg shadow-teal/30 w-full btn-hover">Registrarse</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Donar -->
+  <div id="modal-donar" class="fixed inset-0 bg-charcoal/80 flex items-center justify-center z-[9999] hidden">
+    <div class="bg-cream p-10 rounded-3xl max-w-md w-11/12 relative shadow-2xl animate-[slideDown_0.4s_ease-out]">
+      <button class="modal-close absolute top-4 right-4 bg-none border-none text-3xl cursor-pointer text-charcoal" onclick="cerrarDonar()">&times;</button>
+      <h2 class="font-display text-3xl text-brown mb-2">Gracias por Donar</h2>
+      <p class="font-script text-xl text-teal-dark mb-6">Tu aporte transforma vidas</p>
+
+      <div id="donar-login-msg" class="text-center mb-5">
+        <p class="text-charcoal mb-4">Debes iniciar sesión para donar</p>
+        <button onclick="irALogin()" class="bg-teal text-white px-8 py-3 rounded-full text-sm font-medium uppercase tracking-wide hover:bg-teal-dark transition shadow-lg shadow-teal/30 btn-hover">Iniciar Sesión</button>
+      </div>
+
+      <div id="donar-content" class="hidden">
+        <p class="text-center mb-4">Elige tu aporte:</p>
+        <div class="flex gap-2.5 justify-center mb-5">
+          <button onclick="seleccionarMonto(5000)" class="px-4 py-2.5 border-2 border-teal bg-transparent rounded-lg cursor-pointer hover:bg-teal hover:text-white transition">$5.000</button>
+          <button onclick="seleccionarMonto(10000)" class="px-4 py-2.5 border-2 border-teal bg-transparent rounded-lg cursor-pointer hover:bg-teal hover:text-white transition">$10.000</button>
+          <button onclick="seleccionarMonto(20000)" class="px-4 py-2.5 border-2 border-teal bg-transparent rounded-lg cursor-pointer hover:bg-teal hover:text-white transition">$20.000</button>
+        </div>
+
+        <div class="bg-teal-light p-5 rounded-xl text-center mb-5">
+          <p class="font-medium text-teal-dark mb-2">Escanea para donar con Nequi</p>
+          <div class="w-36 h-36 bg-white mx-auto flex items-center justify-center rounded-lg">
+            <span class="text-5xl">📱</span>
+          </div>
+          <p class="text-xs text-charcoal mt-3">Nequi: <strong>300 8546902</strong></p>
+        </div>
+
+        <a href="https://wa.me/573008546902?text=Hola!%20Quiero%20confirmar%20mi%20donación" class="block text-center bg-teal text-white px-8 py-3 rounded-full text-sm font-medium uppercase tracking-wide hover:bg-teal-dark transition shadow-lg shadow-teal/30">Confirmar por WhatsApp</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Asistente Virtual -->
+  <div id="asistente-btn" class="fixed bottom-6 right-6 w-14 h-14 bg-teal rounded-full flex items-center justify-center cursor-pointer shadow-lg hover:bg-teal-dark transition z-[9998] btn-hover" onclick="toggleAsistente()">
+    <span class="text-2xl">💬</span>
+  </div>
+
+  <div id="asistente-chat" class="fixed bottom-24 right-6 w-80 bg-white rounded-2xl shadow-2xl z-[9998]" style="display:none">
+    <div class="bg-teal text-white px-4 py-3 rounded-t-2xl flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <span class="text-xl">🤖</span>
+        <div>
+          <div class="font-display text-sm font-semibold">Asistente Plato Pequeño</div>
+          <div class="text-xs text-white/80">En línea</div>
+        </div>
+      </div>
+      <button onclick="toggleAsistente()" class="text-white text-xl hover:text-blush">&times;</button>
+    </div>
+    <div id="asistente-mensajes" class="h-64 overflow-y-auto p-4 bg-cream space-y-3">
+      <div class="bg-teal-light p-3 rounded-2xl rounded-tl-none text-sm text-charcoal max-w-[85%]">
+        ¡Hola! Soy tu asistente virtual. Pregúntame sobre Plato Pequeño: servicios, cómo donar, voluntariado, etc.
+      </div>
+    </div>
+    <div class="p-3 border-t border-blush-light flex gap-2">
+      <input type="text" id="asistente-input" placeholder="Escribe tu pregunta..." class="flex-1 px-3 py-2 border border-blush rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-teal" onkeypress="if(event.key==='Enter') enviarMensaje()" />
+      <button onclick="enviarMensaje()" class="bg-teal text-white w-9 h-9 rounded-full flex items-center justify-center hover:bg-teal-dark transition">➤</button>
+    </div>
+  </div>
+
+  <script>
+    function verificarSesion() {
+      const usuario = localStorage.getItem('usuario');
+      if (usuario) {
+        document.getElementById('nav-perfil').style.display = 'block';
+        document.getElementById('nav-login').style.display = 'none';
+      } else {
+        document.getElementById('nav-perfil').style.display = 'none';
+        document.getElementById('nav-login').style.display = 'block';
+      }
+    }
+
+    function mostrarRegistro() {
+      document.getElementById('registro-form').classList.remove('hidden');
+    }
+
+    function registrarUsuario(e) {
+      e.preventDefault();
+      const nombre = document.getElementById('registro-nombre').value;
+      const email = document.getElementById('registro-email').value;
+      const password = document.getElementById('registro-password').value;
+
+      const usuario = { nombre, email, password, donaciones: [] };
+      localStorage.setItem('usuario', JSON.stringify(usuario));
+
+      alert('¡Registro exitoso! Ya puedes iniciar sesión.');
+      document.getElementById('registro-form').classList.add('hidden');
+    }
+
+    function iniciarSesion(e) {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value;
+      const password = document.getElementById('login-password').value;
+
+      const guardado = localStorage.getItem('usuario');
+      if (guardado) {
+        const datos = JSON.parse(guardado);
+        if (datos.email === email && datos.password === password) {
+          document.getElementById('nav-perfil').style.display = 'block';
+          document.getElementById('nav-login').style.display = 'none';
+          alert('¡Bienvenido, ' + datos.nombre + '!');
+          cerrarLogin();
+          if (!document.getElementById('modal-donar').classList.contains('hidden')) {
+            setTimeout(() => {
+              document.getElementById('donar-login-msg').classList.add('hidden');
+              document.getElementById('donar-content').classList.remove('hidden');
+            }, 500);
+          }
+          return;
+        }
+      }
+      alert('Correo o contraseña incorrectos. ¿No tienes cuenta? Regístrate.');
+    }
+
+    function cerrarSesion() {
+      localStorage.removeItem('usuario');
+      location.reload();
+    }
+
+    function verPassword() {
+      const input = document.getElementById('login-password');
+      input.type = input.type === 'password' ? 'text' : 'password';
+    }
+
+    function verPasswordRegistro() {
+      const input = document.getElementById('registro-password');
+      input.type = input.type === 'password' ? 'text' : 'password';
+    }
+
+    function abrirLogin(e) {
+      e.preventDefault();
+      document.getElementById('modal-login').classList.remove('hidden');
+    }
+
+    function abrirDonar(e) {
+      if (e) e.preventDefault();
+      const usuario = localStorage.getItem('usuario');
+      if (usuario) {
+        document.getElementById('modal-donar').classList.remove('hidden');
+        document.getElementById('donar-login-msg').classList.add('hidden');
+        document.getElementById('donar-content').classList.remove('hidden');
+      } else {
+        document.getElementById('modal-donar').classList.remove('hidden');
+        document.getElementById('donar-login-msg').classList.remove('hidden');
+        document.getElementById('donar-content').classList.add('hidden');
+      }
+    }
+
+    function irALogin() {
+      document.getElementById('modal-donar').classList.add('hidden');
+      document.getElementById('modal-login').classList.remove('hidden');
+    }
+
+    function cerrarDonar() {
+      document.getElementById('modal-donar').classList.add('hidden');
+    }
+
+    function cerrarLogin() {
+      document.getElementById('modal-login').classList.add('hidden');
+      document.getElementById('registro-form').classList.add('hidden');
+    }
+
+    function seleccionarMonto(monto) {
+      const usuario = localStorage.getItem('usuario');
+      if (usuario) {
+        const datos = JSON.parse(usuario);
+        if (!datos.donaciones) datos.donaciones = [];
+        datos.donaciones.push({ monto, fecha: new Date().toLocaleDateString() });
+        localStorage.setItem('usuario', JSON.stringify(datos));
+      }
+      alert('Seleccionaste donar $' + monto.toLocaleString() + '. Escanea el código Nequi o confirma por WhatsApp.');
+    }
+
+    // Idioma
+    let idiomaActual = 'es';
+
+    function cambiarIdioma() {
+      idiomaActual = idiomaActual === 'es' ? 'en' : 'es';
+      document.getElementById('idioma-actual').textContent = idiomaActual.toUpperCase();
+
+      const elementos = document.querySelectorAll('[data-es]');
+      elementos.forEach(el => {
+        if (idiomaActual === 'es') {
+          el.innerHTML = el.getAttribute('data-es');
+        } else {
+          el.innerHTML = el.getAttribute('data-en');
+        }
+      });
+
+      localStorage.setItem('idioma', idiomaActual);
+    }
+
+    function cargarIdioma() {
+      const guardado = localStorage.getItem('idioma');
+      if (guardado === 'en') {
+        cambiarIdioma();
+      }
+    }
+
+    // Animaciones scroll
+    const observerOptions = { threshold: 0.15, rootMargin: '0px 0px -80px 0px' };
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, observerOptions);
+
+    document.querySelectorAll('.scroll-reveal').forEach(el => observer.observe(el));
+
+    function scrollSuave(destino, duracion) {
+      const inicio = window.scrollY;
+      const target = document.querySelector(destino);
+      if (!target) return;
+      const offset = target.getBoundingClientRect().top + window.scrollY - 72;
+      const distancia = offset - inicio;
+      let startTime = null;
+      function ease(t) { return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2,3)/2; }
+      function step(timestamp) {
+        if (!startTime) startTime = timestamp;
+        const progress = Math.min((timestamp - startTime) / duracion, 1);
+        window.scrollTo(0, inicio + distancia * ease(progress));
+        if (progress < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(link => {
+      link.addEventListener('click', function(e) {
+        const href = this.getAttribute('href');
+        if (href.length > 1 && document.querySelector(href)) {
+          e.preventDefault();
+          scrollSuave(href, 1400);
+        }
+      });
+    });
+
+    window.addEventListener('load', function() {
+      verificarSesion();
+      cargarIdioma();
+    });
+
+    // Asistente Virtual
+    function toggleAsistente() {
+      const chat = document.getElementById('asistente-chat');
+      if (chat.style.display === 'none' || chat.style.display === '') {
+        chat.style.display = 'block';
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          chat.classList.add('chat-open');
+          setTimeout(() => document.getElementById('asistente-input').focus(), 60);
+        }));
+      } else {
+        chat.classList.remove('chat-open');
+        chat.addEventListener('transitionend', () => { chat.style.display = 'none'; }, { once: true });
+      }
+    }
+
+    const baseConocimiento = {
+      'hola': '¡Hola! 😊 ¿En qué puedo ayudarte hoy?',
+      'buenos dias': '¡Buenos días! ¿En qué te puedo ayudar?',
+      'buenas tardes': '¡Buenas tardes! ¿En qué te puedo ayudar?',
+      'buenas noches': '¡Buenas noches! ¿En qué te puedo ayudar?',
+      'como estas': '¡Muy bien, gracias por preguntar! 😊 Estoy aquí para ayudarte. ¿Qué necesitas saber sobre Plato Pequeño?',
+      'como te va': '¡Todo excelente! Listo para ayudarte.',
+      'que tal': '¡Todo bien por aquí! ¿En qué puedo ayudarte?',
+      'como te llamas': 'Soy el asistente virtual de Plato Pequeño. 🤖 Puedo ayudarte con servicios, donaciones, voluntariado y más.',
+      'quien eres': 'Soy el asistente virtual de Plato Pequeño, aquí para responder tus preguntas.',
+      'que eres': 'Soy un asistente virtual creado para ayudarte a conocer Plato Pequeño.',
+      'gracias': '¡De nada! 😊 ¿Hay algo más en lo que pueda ayudarte?',
+      'muchas gracias': '¡Con mucho gusto! 🙏 Estamos aquí para servirte.',
+      'adios': '¡Hasta luego! Recuerda que puedes volver cuando quieras. 👋',
+      'hasta luego': '¡Hasta pronto! Fue un placer ayudarte.',
+      'chao': '¡Chao! Que tengas un excelente día. 🌟',
+      'ayuda': 'Puedo ayudarte con: comedores comunitarios, recolección de comida, donaciones, voluntariado, misión, valores, contacto. ¡También hago cálculos! 🧮',
+      'que es plato': 'Plato Pequeño es un proyecto social colombiano comprometido con la nutrición y bienestar de comunidades vulnerables. Contamos con comedores comunitarios y realizamos recolección de comida. 🍽️',
+      'que hacen': 'Contamos con el servicio de 🍽️ Comedores Comunitarios y realizamos 🚚 Recolección de Comida para familias vulnerables.',
+      'servicios': 'Nuestros servicios:\n1) 🍽️ Comedores Comunitarios\n2) 🚚 Recolección de Comida',
+      'como donar': 'Puedes donar por Nequi al 300 8546902 o presionando el botón "Donar". ¡Cada peso cuenta! 💚',
+      'donar': 'Puedes donar por Nequi al 300 8546902. Confirmamos por WhatsApp: 300 8546902.',
+      'nequi': 'Nequi: 300 8546902. Escanea el código QR en la sección de donaciones.',
+      'whatsapp': 'WhatsApp: 300 8546902. Para confirmar donaciones o hacer consultas.',
+      'voluntariado': '¡Contamos con 80+ voluntarios activos! Únete escribéndonos por WhatsApp: 300 8546902 🙋',
+      'voluntarios': 'Tenemos 80+ voluntarios activos. Contáctanos al WhatsApp 300 8546902 para unirte.',
+      'familias': 'Atendemos a más de 500 familias en situación de vulnerabilidad.',
+      'platos': 'Hemos servido más de 12,000 platos nutritivos. 🍽️',
+      'impacto': 'Nuestro impacto: 500+ familias atendidas, 12,000+ platos servidos, 80+ voluntarios activos.',
+      'mision': 'Nuestra misión: Alimentar con dignidad y amor a las comunidades vulnerables. 💚',
+      'vision': 'Nuestra visión: Ser un referente de impacto social a través de la alimentación.',
+      'valores': 'Nuestros valores: Solidaridad, Transparencia, Compromiso y Calidez Humana. ❤️',
+      'contacto': 'Contáctanos:\n• Email:  platopequeno6@gmail.com\n• WhatsApp: 300 8546902\n• Instagram: @platopequeno',
+      'email': 'Email:  platopequeno6@gmail.com',
+      'telefono': 'WhatsApp: 300 8546902',
+      'redes': 'Síguenos:\n📸 Instagram: @platopequeno\n📱 WhatsApp: 300 8546902',
+      'instagram': 'Instagram: @platopequeno',
+      'donde': 'Trabajamos con comunidades vulnerables en Colombia.',
+      'colombia': 'Sí, trabajamos en Colombia con comunidades de escasos recursos.',
+      'recoleccion': 'Realizamos recolección de alimentos para redistribuirlos a familias vulnerables, reduciendo el desperdicio y ampliando nuestro alcance. 🚚',
+      'comedores': 'Contamos con comedores comunitarios: espacios de alimentación colectiva con menús nutritivos preparados con amor para familias de escasos recursos. 🍲',
+      'cuanto donar': 'Puedes donar lo que puedas. Opciones desde $5,000 hasta $50,000 y más. 💚',
+      'como funciona': 'Recibimos donaciones y realizamos recolección de alimentos → los preparamos en nuestros comedores comunitarios → llegamos a las familias vulnerables. 🍽️',
+    };
+
+    function quitarTildes(s) {
+      return s.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    }
+
+    function calcularMatematica(texto) {
+      const limpio = texto.trim()
+        .replace(/x\s/gi, '*').replace(/[\u00f7]/g, '/').replace(/\^/g, '**')
+        .replace(/[^\d\s\+\-\*\/\.\(\)%]/g, '').trim();
+      if (limpio.length > 1 && /\d/.test(limpio) && /[\+\-\*\/]/.test(limpio)) {
+        try {
+          const resultado = Function('"use strict"; return (' + limpio + ')')();
+          if (isFinite(resultado)) return '🧮 El resultado es: <strong>' + resultado + '</strong>';
+        } catch(e) {}
+      }
+      return null;
+    }
+
+    function encontrarRespuesta(mensaje) {
+      const mat = calcularMatematica(mensaje);
+      if (mat) return mat;
+
+      const normalizado = quitarTildes(mensaje);
+      let mejorPuntaje = 0;
+      let mejorRespuesta = null;
+
+      for (const [clave, valor] of Object.entries(baseConocimiento)) {
+        const claveN = quitarTildes(clave);
+        let puntaje = 0;
+        if (normalizado.includes(claveN)) {
+          puntaje = claveN.split(' ').length * 3 + claveN.length;
+        } else {
+          for (const p of claveN.split(' ')) {
+            if (p.length > 2 && normalizado.includes(p)) puntaje++;
+          }
+        }
+        if (puntaje > mejorPuntaje) { mejorPuntaje = puntaje; mejorRespuesta = valor; }
+      }
+
+      if (mejorPuntaje > 0) return mejorRespuesta;
+
+      const historial = JSON.parse(localStorage.getItem('chatHistorial') || '[]');
+      const ultimo = historial[historial.length - 1];
+      if (ultimo === 'donar') return '¿Tienes más preguntas sobre donaciones? Nequi: 300 8546902';
+      if (ultimo === 'voluntariado') return '¿Más preguntas sobre voluntariado? WhatsApp: 300 8546902.';
+
+      return 'No tengo información sobre eso. 🤔 Puedo ayudarte con:\n• Servicios y programas\n• Cómo donar\n• Voluntariado\n• Misión y valores\n• Contacto\n\n¡También hago cálculos matemáticos! 🧮';
+    }
+
+    function enviarMensaje() {
+      const input = document.getElementById('asistente-input');
+      const textoOriginal = input.value.trim();
+      const mensaje = textoOriginal.toLowerCase();
+      if (!mensaje) return;
+
+      const mensajesDiv = document.getElementById('asistente-mensajes');
+      mensajesDiv.innerHTML += `<div class="bg-teal text-white p-3 rounded-2xl rounded-tr-none text-sm max-w-[85%] ml-auto">${textoOriginal}</div>`;
+      input.value = '';
+      mensajesDiv.scrollTop = mensajesDiv.scrollHeight;
+
+      mensajesDiv.innerHTML += `<div id="typing-ind" class="bg-teal-light p-3 rounded-2xl rounded-tl-none text-sm max-w-[85%] flex items-center gap-1"><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span></div>`;
+      mensajesDiv.scrollTop = mensajesDiv.scrollHeight;
+
+      setTimeout(() => {
+        const ind = document.getElementById('typing-ind');
+        if (ind) ind.remove();
+
+        const respuesta = encontrarRespuesta(mensaje);
+
+        const historial = JSON.parse(localStorage.getItem('chatHistorial') || '[]');
+        if (mensaje.includes('donar') || mensaje.includes('donac')) historial.push('donar');
+        else if (mensaje.includes('voluntar')) historial.push('voluntariado');
+        if (historial.length > 5) historial.shift();
+        localStorage.setItem('chatHistorial', JSON.stringify(historial));
+
+        mensajesDiv.innerHTML += `<div class="bg-teal-light p-3 rounded-2xl rounded-tl-none text-sm text-charcoal max-w-[85%] whitespace-pre-line">${respuesta}</div>`;
+        mensajesDiv.scrollTop = mensajesDiv.scrollHeight;
+      }, 700);
+    }
+
+    // Cerrar modales con click fuera
+    window.addEventListener('click', function(e) {
+      if (e.target === document.getElementById('modal-login')) {
+        cerrarLogin();
+      }
+      if (e.target === document.getElementById('modal-donar')) {
+        cerrarDonar();
+      }
+    });
+  </script>
+
+</body>
+</html>

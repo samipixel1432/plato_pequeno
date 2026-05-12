@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mi Perfil – Plato Pequeño</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Dancing+Script:wght@600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <nav>
+    <div class="nav-logo" onclick="window.location.href='index.html'" style="cursor:pointer;">Plato Pequeño</div>
+    <ul class="nav-links">
+      <li><a href="index.html#inicio">Inicio</a></li>
+      <li><a href="index.html#nosotros">Nosotros</a></li>
+      <li><a href="index.html#servicios">Servicios</a></li>
+      <li><a href="index.html#impacto">Impacto</a></li>
+      <li><a href="perfil.html" style="color: var(--teal-dark);">Mi Perfil</a></li>
+    </ul>
+  </nav>
+
+  <section class="perfil-section" style="min-height: 100vh; display: flex; align-items: center; padding-top: 100px;">
+    <div class="perfil-card">
+      <div class="perfil-avatar">👤</div>
+      <h3 id="perfil-nombre" style="font-family: var(--font-display); font-size: 1.5rem; color: var(--brown); margin-bottom: 8px;"></h3>
+      <p id="perfil-email" class="perfil-email"></p>
+
+      <div class="perfil-donaciones">
+        <h4>Historial de Donaciones</h4>
+        <div id="perfil-donaciones-lista">
+          <p style="color: var(--charcoal); font-size: 0.9rem;">No has realizado donaciones aún.</p>
+        </div>
+      </div>
+
+      <button class="btn-logout" onclick="cerrarSesion()">Cerrar Sesión</button>
+    </div>
+  </section>
+
+  <script>
+    function verificarSesion() {
+      const usuario = localStorage.getItem('usuario');
+      if (!usuario) {
+        window.location.href = 'index.html';
+        return;
+      }
+      const datos = JSON.parse(usuario);
+      document.getElementById('perfil-nombre').textContent = datos.nombre;
+      document.getElementById('perfil-email').textContent = datos.email;
+      cargarDonaciones();
+    }
+
+    function cerrarSesion() {
+      localStorage.removeItem('usuario');
+      window.location.href = 'index.html';
+    }
+
+    function cargarDonaciones() {
+      const usuario = localStorage.getItem('usuario');
+      if (usuario) {
+        const datos = JSON.parse(usuario);
+        const lista = document.getElementById('perfil-donaciones-lista');
+        if (datos.donaciones && datos.donaciones.length > 0) {
+          lista.innerHTML = datos.donaciones.map(d =>
+            '<div class="donacion-item"><span>' + d.fecha + '</span><strong>$' + d.monto.toLocaleString() + '</strong></div>'
+          ).join('');
+        }
+      }
+    }
+
+    window.addEventListener('load', verificarSesion);
+  </script>
+
+</body>
+</html>
